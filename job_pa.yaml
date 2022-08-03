@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: myjobsecret
+spec:
+  ttlSecondsAfterFinished: 10
+  template:
+    spec:
+      containers:
+      - name: paexecsecret
+        image: canariodocker/pysparkproject
+        envFrom:
+          - secretRef: 
+              name: pasecret
+        args:
+          - "/opt/spark/bin/spark-submit"
+          - "--master"
+          - "local[2]"
+          - "main.py"
+          - "--nfunc"
+          - "2"
+          - "--origin"
+          - "s3a://igti-projeto-aplicado/processing-zone/prata"
+          - "--target"
+          - "s3a://igti-projeto-aplicado/processing-zone/ouro/dim/"
+          - "--iswrite"
+          - "1"
+      restartPolicy: Never
